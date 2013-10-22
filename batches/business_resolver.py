@@ -46,6 +46,4 @@ class BusinessResolver(object):
                 if jellyfish.jaro_distance(flat_input[key], matching_dict[key]) > self.JARO_THRESHOLD:
                     score += 1
                 else: score -= 1
-        print input_dict
-        print score
         return score
