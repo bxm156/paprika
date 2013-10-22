@@ -42,7 +42,7 @@ class BusinessResolver(object):
         score = 0
         flat_input = self.flatten(input_dict)
         for key, value in matching_dict.items():
-            if key in flat_input:
+            if matching_dict[key] != None and key in flat_input:
                 if jellyfish.jaro_distance(flat_input[key], matching_dict[key]) > self.JARO_THRESHOLD:
                     score += 1
                 else: score -= 1
