@@ -1,8 +1,7 @@
 from collections import defaultdict
 from collections import MutableMapping
 
-import jellyfish
-
+import jaro
 
 class BusinessResolver(object):
 
@@ -43,7 +42,7 @@ class BusinessResolver(object):
         flat_input = self.flatten(input_dict)
         for key, value in matching_dict.items():
             if matching_dict[key] != None and key in flat_input:
-                if jellyfish.jaro_distance(flat_input[key], matching_dict[key]) > self.JARO_THRESHOLD:
+                if jaro.jaro_winkler_metric(unicode(flat_input[key]), unicode(matching_dict[key])) > self.JARO_THRESHOLD:
                     score += 1
                 else: score -= 1
         return score

@@ -1,5 +1,6 @@
 import os
 import sys
+import logging
 from pymongo import MongoClient
 from yelpy.yelpy_client import YelpyClient
 
@@ -12,6 +13,11 @@ class MongoMergeController(object):
     db = None
     business_resolver = BusinessResolver()
     yc = YelpyClient()
+
+    def __init__(self):
+        super(MongoMergeController, self).__init__()
+        logging.basicConfig(level=logging.INFO)
+        self.logger = logging.getLogger(__name__)
 
     def connect(self):
         mongo_url = os.getenv('MONGOHQ_URL')
@@ -52,7 +58,10 @@ class MongoMergeController(object):
         business = self.find_business(input_json['name'], input_json['city'], input_json['state'], phone=None, yelpy_client=yc)
         if business is None:
             return
+        self.logger.info(input_json)
         input_json.update(business)
+        input_json.update({'yelp_supplement': True})
+        self.logger.info(input_json)
         db.YELP_BUSINESSES.save(input_json)
 
     def process_rand(self):
