@@ -9,10 +9,10 @@ from mongo_merge_controller import MongoMergeController
 
 class YelpMergeBatch(object):
 
-    min_sleep = 10
-    max_sleep = 120
+    min_sleep = 80
+    max_sleep = 180
 
-    max_iterations = 10
+    max_iterations = 2200
     iterations = 0
     
     def __init__(self):
@@ -34,7 +34,7 @@ class YelpMergeBatch(object):
                 return
 
             #results = self.db.YELP_BUSINESSES.find({"yelp_supplement": True}).limit(5)
-            results = self.db.YELP_BUSINESSES.find({"yelp_supplement": {"$exists": False}}).limit(10)
+            results = self.db.YELP_BUSINESSES.find({"yelp_supplement": {"$exists": False}}).limit(5)
             blobs = list(results)
 
             merger = MongoMergeController()
