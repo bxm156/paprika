@@ -37,7 +37,7 @@ class MongoMergeController(object):
         for input_value in input_values:
             self.logger.info("Attempting.. %s" % (input_value.get('business_id', '?')))
             self.merge(db, input_value, self.yc)
-        self.logger.info("Total Queries: %s" % (self.client.total_calls))
+        self.logger.info("Total Queries: %s" % (self.yc.total_calls))
         self.disconnect()
 
     def find_business(self, name, city, state, phone, yelpy_client=None):
