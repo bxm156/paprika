@@ -12,7 +12,7 @@ class MongoMergeController(object):
     client = None
     db = None
     business_resolver = BusinessResolver()
-    yc = YelpyClient()
+    yc = YelpyClient(max_calls=7500)
 
     def __init__(self):
         super(MongoMergeController, self).__init__()

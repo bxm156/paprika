@@ -9,7 +9,7 @@ from mongo_merge_controller import MongoMergeController
 
 class YelpMergeBatch(object):
 
-    min_sleep = 80
+    min_sleep = 110
     max_sleep = 180
 
     max_iterations = 2200
@@ -28,6 +28,7 @@ class YelpMergeBatch(object):
         return MongoClient(mongo_url)
 
     def run(self):
+        merger = MongoMergeController()
         while True:
             self.iterations += 1
             if self.iterations > self.max_iterations:
@@ -37,7 +38,6 @@ class YelpMergeBatch(object):
             results = self.db.YELP_BUSINESSES.find({"yelp_supplement": {"$exists": False}}).limit(5)
             blobs = list(results)
 
-            merger = MongoMergeController()
             merger.process(blobs) 
 
 
