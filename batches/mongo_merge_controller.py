@@ -41,14 +41,13 @@ class MongoMergeController(object):
     def find_business(self, name, city, state, phone, yelpy_client=None):
         yelpy_client = yelpy_client or self.yc
         location = city + ", " + state
-        result = yelpy_client.search(term=name, location=location, limit=3)
+        result = yelpy_client.search(term=name, location=location, limit=5)
         region = result['region']
         total = result['total']
         businesses = result['businesses']
         if not businesses:
             return None
         return self.business_resolver.resolve(businesses, { 'name': name, 'location_city': city, 'location_state_code': state, 'phone': phone})
-
 
     def merge(self, db, input_json, yc):
         assert input_json['_id']
@@ -60,9 +59,17 @@ class MongoMergeController(object):
             return
         self.logger.info(input_json)
         input_json.update(business)
+        business = yc.business(business['id'])
+        reviews  = business.get('reviews', [])
+        for r in reviews:
+            r.update({'business_id': input_json['business_id']})
+            r.update({'yelp_supplement': True})
+
+        input_json.update(business)
         input_json.update({'yelp_supplement': True})
         self.logger.info(input_json)
         db.YELP_BUSINESSES.save(input_json)
+        db.YELP_REVIEWS.insert(reviews)
 
     def process_rand(self):
         self.connect()

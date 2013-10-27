@@ -33,7 +33,8 @@ class YelpMergeBatch(object):
             if self.iterations > self.max_iterations:
                 return
 
-            results = self.db.YELP_BUSINESSES.find({"yelp_supplement": {"$exists": False}}).limit(5)
+            #results = self.db.YELP_BUSINESSES.find({"yelp_supplement": True}).limit(5)
+            results = self.db.YELP_BUSINESSES.find({"yelp_supplement": {"$exists": False}}).limit(10)
             blobs = list(results)
 
             merger = MongoMergeController()
