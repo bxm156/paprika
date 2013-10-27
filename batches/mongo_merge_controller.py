@@ -48,6 +48,7 @@ class MongoMergeController(object):
         total = result['total']
         businesses = result['businesses']
         if not businesses:
+            self.logger.info("No business found")
             return None
         return self.business_resolver.resolve(businesses, { 'name': name, 'location_city': city, 'location_state_code': state, 'phone': phone})
 
@@ -58,6 +59,8 @@ class MongoMergeController(object):
         assert input_json['state']
         business = self.find_business(input_json['name'], input_json['city'], input_json['state'], phone=None, yelpy_client=yc)
         if business is None:
+            input_json.update({'yelp_supplement': False})
+            db.YELP_BUSINESSES.save(input_json)
             return
         input_json.update(business)
         business = yc.business(business['id'])
