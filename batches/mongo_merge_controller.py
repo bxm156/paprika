@@ -35,7 +35,9 @@ class MongoMergeController(object):
         self.connect()
         db = self.get_db()
         for input_value in input_values:
+            self.logger.info("Attempting.. %s" % (input_value.get('business_id', '?')))
             self.merge(db, input_value, self.yc)
+        self.logger.info("Total Queries: %s" % (self.client.total_calls))
         self.disconnect()
 
     def find_business(self, name, city, state, phone, yelpy_client=None):
@@ -57,7 +59,6 @@ class MongoMergeController(object):
         business = self.find_business(input_json['name'], input_json['city'], input_json['state'], phone=None, yelpy_client=yc)
         if business is None:
             return
-        self.logger.info(input_json)
         input_json.update(business)
         business = yc.business(business['id'])
         reviews  = business.get('reviews', [])
@@ -67,7 +68,6 @@ class MongoMergeController(object):
 
         input_json.update(business)
         input_json.update({'yelp_supplement': True})
-        self.logger.info(input_json)
         db.YELP_BUSINESSES.save(input_json)
         db.YELP_REVIEWS.insert(reviews)
 
