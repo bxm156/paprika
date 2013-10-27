@@ -7,6 +7,6 @@ psycopg2==2.5.1
 wsgiref==0.1.2
 pymongo==2.6.2
 jaro-winkler==1.0.2
-Yelpy==0.2.4dev
+Yelpy==0.2.5dev
 oauth2-utf8
 
