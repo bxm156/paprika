@@ -6,7 +6,7 @@ from yelpy.yelpy_client import YelpyClient
 
 class BusinessCrawler(object):
 
-    yc = YelpyClient(max_calls=100)
+    yc = YelpyClient(max_calls=7000)
 
     def __init__(self):
         super(BusinessCrawler, self).__init__()
@@ -20,9 +20,14 @@ class BusinessCrawler(object):
             search_request = self.db.YELP_SEARCH.find_one({'complete': {'$exists': False}})
             if search_request is None:
                 return
+            print search_request
             city = search_request['city']
             state = search_request['state']
-            self.crawl(city, state, False, 10000)
+            try:
+                self.crawl(city, state, False, 7000)
+            except Exception as e:
+                print e
+                sys.exit(0)
             search_request.update({'complete': True})
             self.db.YELP_SEARCH.save(search_request)
 
@@ -60,15 +65,15 @@ class BusinessCrawler(object):
         assert business['id']
         if not self.business_exists(business['id']):
             business.update({'yelp_supplement': True, 'business_id': business['id']})
-            self.db.YELP_BUSINESSES2.insert(business)
+            self.db.YELP_BUSINESSES.insert(business)
             reviews = business.get('reviews', [])
             if reviews:
                 for r in reviews:
                     r.update({'yelp_supplement': True, 'business_id': business['id']})
-                self.db.YELP_REVIEWS2.insert(reviews)
+                self.db.YELP_REVIEWS.insert(reviews)
 
     def business_exists(self, business_id):
-        if self.db.YELP_BUSINESSES2.find({"id": business_id}).count() >= 1:
+        if self.db.YELP_BUSINESSES.find({"id": business_id}).count() >= 1:
             return True
         else:
             return False
