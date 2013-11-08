@@ -1,5 +1,8 @@
 import sys
 import os
+import time
+import logging
+import random
 from pymongo import MongoClient
 
 from yelpy.yelpy_client import YelpyClient
@@ -14,13 +17,16 @@ class BusinessCrawler(object):
         assert mongo_url
         self.client = MongoClient(mongo_url)
         self.db = self.client.get_default_database()
+        logging.basicConfig(level=logging.INFO)
+        self.logger = logging.getLogger(__name__)
+        random.seed()
 
     def run(self):
         while True:
             search_request = self.db.YELP_SEARCH.find_one({'complete': {'$exists': False}})
             if search_request is None:
                 return
-            print search_request
+            self.logger.info(search_request)
             city = search_request['city']
             state = search_request['state']
             try:
@@ -33,7 +39,7 @@ class BusinessCrawler(object):
 
     def crawl(self, city, state, deals_filter, total):
         offset = 0
-        print offset
+        self.logger.info("Offset: %d" % (offset,))
         while offset < total:
             result = self.search(city, state, offset, deals_filter)
             business_count = len(result['businesses'])
@@ -49,7 +55,10 @@ class BusinessCrawler(object):
                 else:
                     assert biz['id']
                     self.add_business(biz['id'])
-                    offset += 1                
+                    offset += 1
+            sleep_time = random.randint(110, 180)
+            self.logger.info("Sleeping for %s seconds..." % (sleep_time,))
+            time.sleep(sleep_time)
 
     def search(self, city, state, offset, deals_filter=False):
         location = "%s, %s" % (city, state,)
